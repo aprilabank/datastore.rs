@@ -10,6 +10,14 @@ Not all operations and types are implemented yet.
 
 Serialisation to and from entities is performed via [serde]().
 
+# Rationale
+
+Several half-finished Datastore clients already exist for Rust, however they seem to have been generated from either the
+Google API description service and not work at all or from outdated gRPC definitions.
+
+In order to provide a nicely usable client and integration with the Rust ecosystem, e.g. Serde, hand-rolling a client
+seemed like the better option. Plus it's fun!
+
 # Authentication
 
 Ideally this would support all forms of authentication that the Google Cloud SDK
