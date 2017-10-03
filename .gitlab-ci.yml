@@ -1,0 +1,4 @@
+---
+image: rust:1.20
+test:
+  script: cargo test --no-fail-fast
