@@ -33,14 +33,15 @@ Required for now are:
  
 ## Types
 
-* [ ] [Entity](https://cloud.google.com/datastore/docs/reference/rest/v1/Entity)
+* [x] [Entity](https://cloud.google.com/datastore/docs/reference/rest/v1/Entity)
 * [ ] [EntityResult](https://cloud.google.com/datastore/docs/reference/rest/v1/EntityResult)
-* [ ] [Key](https://cloud.google.com/datastore/docs/reference/rest/v1/Key)
-* [ ] [PartitionId](https://cloud.google.com/datastore/docs/reference/rest/v1/PartitionId)
+* [x] [Key](https://cloud.google.com/datastore/docs/reference/rest/v1/Key)
+* [ ] [Value](https://cloud.google.com/datastore/docs/reference/rest/v1/projects/runQuery#Value)
+* [x] [PartitionId](https://cloud.google.com/datastore/docs/reference/rest/v1/PartitionId)
 * [ ] [ReadOptions](https://cloud.google.com/datastore/docs/reference/rest/v1/ReadOptions)
 * [ ] [CommonMetadata](https://cloud.google.com/datastore/docs/reference/rest/Shared.Types/CommonMetadata)
 * [ ] [EntityFilter](https://cloud.google.com/datastore/docs/reference/rest/Shared.Types/EntityFilter)
-* [ ] [LatLng](https://cloud.google.com/datastore/docs/reference/rest/Shared.Types/LatLng)
+* [x] [LatLng](https://cloud.google.com/datastore/docs/reference/rest/Shared.Types/LatLng)
 * [ ] [Operation](https://cloud.google.com/datastore/docs/reference/rest/Shared.Types/Operation)
 * [ ] [OperationType](https://cloud.google.com/datastore/docs/reference/rest/Shared.Types/OperationType)
 * [ ] [Progress](https://cloud.google.com/datastore/docs/reference/rest/Shared.Types/Progress)
