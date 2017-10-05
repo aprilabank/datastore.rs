@@ -131,8 +131,5 @@ pub enum Value {
 
 #[derive(Debug, Deserialize, Serialize, PartialEq)]
 pub struct Entity {
-    // Key must be present for all non-nested entities.
-    // TODO: Encode as type.
-    key: Option<Key>,
     properties: HashMap<String, Value>,
 }
