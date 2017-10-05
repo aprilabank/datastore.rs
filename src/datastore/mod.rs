@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use serde::de::Error;
 use serde::{Serialize, Deserialize, Serializer, Deserializer};
 use base64;
+use chrono::{DateTime, Utc};
 
 #[cfg(test)]
 mod tests;
@@ -126,7 +127,10 @@ pub enum Value {
         #[serde(rename = "blobValue")]
         blob_value: Blob
     },
-    // TODO: Timestamp { timestamp_value: ? },
+    Timestamp {
+        #[serde(rename = "timestampValue")]
+        timestamp_value: DateTime<Utc>,
+    },
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq)]

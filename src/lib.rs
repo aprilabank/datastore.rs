@@ -3,6 +3,7 @@ extern crate serde_derive;
 extern crate serde;
 extern crate serde_json;
 extern crate base64;
+extern crate chrono;
 
 pub mod datastore;
 
