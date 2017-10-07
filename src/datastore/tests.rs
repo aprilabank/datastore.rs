@@ -1,9 +1,8 @@
 use datastore::*;
 use serde_json;
-
-fn test_project_id() -> String {
-    "test-project".to_string()
-}
+use chrono::{TimeZone, Utc};
+use std::fs::File;
+use std::path::{Path, PathBuf};
 
 #[test]
 fn test_path_element_serialisation() {
@@ -41,4 +40,40 @@ fn test_int_serialisation() {
 
     let deserialised: Int = serde_json::from_str(serialised.as_str()).expect("Deserialisation failed");
     assert_eq!(int, deserialised, "Deserialised int shoudl match initial value");
+}
+
+#[test]
+fn test_entity_deserialisation() {
+    let mut d = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    d.push("resources/entity-test.json");
+    let file = File::open(d.as_ref() as &Path)
+        .expect("Could not open test file");
+    let deserialised: Entity = serde_json::from_reader(file).expect("Deserialisation failed");
+
+    let expected_time =
+        Utc.ymd(2017, 09, 21).and_hms(05, 41, 33);
+
+    let expected_cl_options = hashmap!(
+        "scoringStatus".to_string() => Value::String { string_value: "Accepted".to_string() },
+    );
+
+    let expected_products = Value::Array {
+        array_value: ArrayValue {
+            values: vec![ Value::String { string_value: "creditline".to_string() } ],
+        },
+    };
+
+    let properties = hashmap!(
+        "email".to_string() => Value::String { string_value: "mags@mag".to_string() },
+        "companyCountry".to_string() => Value::String { string_value: "NO".to_string() },
+        "status".to_string() => Value::EntityValue {
+            entity_value: Entity { properties: expected_cl_options },
+        },
+        "signingId".to_string() => Value::Null { null_value: () },
+        "created".to_string() => Value::Timestamp { timestamp_value: expected_time },
+        "availableProducts".to_string() => expected_products,
+    );
+
+    let expected = Entity { properties };
+    assert_eq!(expected, deserialised, "Deserialised value should match expectations");
 }

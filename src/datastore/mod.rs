@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use serde::de::Error;
 use serde::{Serialize, Deserialize, Serializer, Deserializer};
 use base64;
+use chrono::{DateTime, Utc};
 
 #[cfg(test)]
 mod tests;
@@ -82,25 +83,57 @@ impl<'de> Deserialize<'de> for Int {
     }
 }
 
+// Currently the many nested attributes are needed because of https://github.com/serde-rs/serde/issues/1061
 #[derive(Debug, Deserialize, Serialize, PartialEq)]
-#[serde(untagged, rename_all = "camelCase")]
+#[serde(untagged)]
 pub enum Value {
-    Null { null_value: () },
-    Boolean { boolean_value: bool },
-    Integer { integer_value: Int },
-    Double { double_value: f64 },
-    Array { array_value: ArrayValue },
-    GeoPoint { geo_point_value: LatLng },
-    EntityValue { entity_value: Entity },
-    KeyValue { key_value: Key },
-    Blob { blob_value: Blob },
-    // TODO: Timestamp { timestamp_value: ? },
+    Null {
+        #[serde(rename = "nullValue")]
+        null_value: ()
+    },
+    String {
+        #[serde(rename = "stringValue")]
+        string_value: String
+    },
+    Boolean {
+        #[serde(rename = "booleanValue")]
+        boolean_value: bool
+    },
+    Integer {
+        #[serde(rename = "integerValue")]
+        integer_value: Int
+    },
+    Double {
+        #[serde(rename = "doubleValue")]
+        double_value: f64
+    },
+    Array {
+        #[serde(rename = "arrayValue")]
+        array_value: ArrayValue
+    },
+    GeoPoint {
+        #[serde(rename = "geoPointValue")]
+        geo_point_value: LatLng
+    },
+    EntityValue {
+        #[serde(rename = "entityValue")]
+        entity_value: Entity
+    },
+    KeyValue {
+        #[serde(rename = "keyValue")]
+        key_value: Key
+    },
+    Blob {
+        #[serde(rename = "blobValue")]
+        blob_value: Blob
+    },
+    Timestamp {
+        #[serde(rename = "timestampValue")]
+        timestamp_value: DateTime<Utc>,
+    },
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq)]
 pub struct Entity {
-    // Key must be present for all non-nested entities.
-    // TODO: Encode as type.
-    key: Option<Key>,
     properties: HashMap<String, Value>,
 }

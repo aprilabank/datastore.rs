@@ -1,0 +1,34 @@
+{
+  "properties": {
+    "status": {
+      "entityValue": {
+        "properties": {
+          "scoringStatus": {
+            "stringValue": "Accepted"
+          }
+        }
+      }
+    },
+    "email": {
+      "stringValue": "mags@mag"
+    },
+    "signingId": {
+      "nullValue": null
+    },
+    "availableProducts": {
+      "arrayValue": {
+        "values": [
+          {
+            "stringValue": "creditline"
+          }
+        ]
+      }
+    },
+    "companyCountry": {
+      "stringValue": "NO"
+    },
+    "created": {
+      "timestampValue": "2017-09-21T05:41:33Z"
+    }
+  }
+}
