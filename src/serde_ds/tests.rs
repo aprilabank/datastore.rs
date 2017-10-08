@@ -129,3 +129,37 @@ fn test_serialize_map() {
 
     assert_eq!(expected, result);
 }
+
+#[test]
+fn test_serialize_struct() {
+    #[derive(Debug, Serialize)]
+    struct Language<'a> {
+        name: &'a str,
+        strongly_typed: bool,
+    };
+
+    let rust = Language {
+        name: "Rust",
+        strongly_typed: true,
+    };
+
+    let serialized = ser::to_value(&rust).expect("struct serialization failed");
+
+    let mut expected_properties = HashMap::new();
+    expected_properties.insert(
+        "name".to_string(),
+        Value::String { string_value: "Rust".to_string() },
+    );
+    expected_properties.insert(
+        "strongly_typed".to_string(),
+        Value::Boolean { boolean_value: true },
+    );
+
+    let expected = Value::EntityValue {
+        entity_value: Entity {
+            properties: expected_properties,
+        }
+    };
+
+    assert_eq!(expected, serialized);
+}

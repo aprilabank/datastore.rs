@@ -21,7 +21,7 @@ impl<'a> ser::Serializer for &'a Serializer {
     type SerializeTupleStruct = Self;
     type SerializeTupleVariant = Self;
     type SerializeMap = MapSerializer<'a>;
-    type SerializeStruct = Self;
+    type SerializeStruct = MapSerializer<'a>;
     type SerializeStructVariant = Self;
 
     fn serialize_bool(self, v: bool) -> Result<Self::Ok> {
@@ -132,7 +132,13 @@ impl<'a> ser::Serializer for &'a Serializer {
     }
 
     fn serialize_struct(self, name: &'static str, len: usize) -> Result<Self::SerializeStruct> {
-        Ok(self) // TODO: Presumably?
+        let map_serializer = MapSerializer {
+            ser: &self,
+            map: HashMap::new(),
+            key: Option::None,
+        };
+
+        Ok(map_serializer)
     }
 
     fn serialize_struct_variant(self, name: &'static str, variant_index: u32, variant: &'static str, len: usize) -> Result<Self::SerializeStructVariant> {
@@ -201,9 +207,30 @@ impl<'a> ser::SerializeMap for MapSerializer<'a> {
     }
 
     fn end(self) -> Result<Self::Ok> {
-        let properties = self.map.clone();
         let entity_value = Entity {
-            properties
+            properties: self.map,
+        };
+
+        Ok(Value::EntityValue { entity_value })
+    }
+
+    // TODO: Implement serialize_entry() to avoid the usage of the Option.
+}
+
+impl<'a> ser::SerializeStruct for MapSerializer<'a> {
+    type Ok = Value;
+    type Error = Error;
+
+    fn serialize_field<T>(&mut self, key: &'static str, value: &T) -> Result<()> where
+        T: ? Sized + Serialize {
+        let serialized_value = value.serialize(self.ser)?;
+        self.map.insert(key.to_string(), serialized_value);
+        Ok(())
+    }
+
+    fn end(self) -> Result<Self::Ok> {
+        let entity_value = Entity {
+            properties: self.map,
         };
 
         Ok(Value::EntityValue { entity_value })
@@ -229,20 +256,6 @@ impl<'a> ser::SerializeSeq for &'a Serializer {
     type Error = Error;
 
     fn serialize_element<T: ? Sized>(&mut self, value: &T) -> Result<()> where
-        T: Serialize {
-        unimplemented!()
-    }
-
-    fn end(self) -> Result<Self::Ok> {
-        unimplemented!()
-    }
-}
-
-impl<'a> ser::SerializeStruct for &'a Serializer {
-    type Ok = Value;
-    type Error = Error;
-
-    fn serialize_field<T: ? Sized>(&mut self, key: &'static str, value: &T) -> Result<()> where
         T: Serialize {
         unimplemented!()
     }
