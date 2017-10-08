@@ -12,6 +12,7 @@ pub enum Error {
     DeserialisationError(String),
     UnsupportedValueType(&'static str),
     UnsupportedCompoundType(&'static str),
+    UnsupportedKeyType(),
 }
 
 // https://serde.rs/error-handling.html

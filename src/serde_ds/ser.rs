@@ -1,8 +1,10 @@
+use std::collections::HashMap;
 use std::fmt::Display;
 use serde::ser::{self, Serialize};
 use serde_ds::error::{Error, Result};
 use datastore::{Value, Entity, Int, Blob};
 
+#[derive(Copy, Clone)]
 pub struct Serializer;
 
 pub fn to_value<T: Serialize>(value: &T) -> Result<Value> {
@@ -18,7 +20,7 @@ impl<'a> ser::Serializer for &'a Serializer {
     type SerializeTuple = Self;
     type SerializeTupleStruct = Self;
     type SerializeTupleVariant = Self;
-    type SerializeMap = Self;
+    type SerializeMap = MapSerializer<'a>;
     type SerializeStruct = Self;
     type SerializeStructVariant = Self;
 
@@ -120,7 +122,13 @@ impl<'a> ser::Serializer for &'a Serializer {
     }
 
     fn serialize_map(self, len: Option<usize>) -> Result<Self::SerializeMap> {
-        Ok(self)
+        let map_serializer = MapSerializer {
+            ser: &self,
+            map: HashMap::new(),
+            key: Option::None,
+        };
+
+        Ok(map_serializer)
     }
 
     fn serialize_struct(self, name: &'static str, len: usize) -> Result<Self::SerializeStruct> {
@@ -155,22 +163,50 @@ impl<'a> ser::Serializer for &'a Serializer {
     }
 }
 
-impl<'a> ser::SerializeMap for &'a Serializer {
+pub struct MapSerializer<'a> {
+    ser: &'a Serializer,
+    map: HashMap<String, Value>,
+    key: Option<String>,
+}
+
+impl<'a> ser::SerializeMap for MapSerializer<'a> {
     type Ok = Value;
     type Error = Error;
 
-    fn serialize_key<T: ? Sized>(&mut self, key: &T) -> Result<()> where
-        T: Serialize {
-        unimplemented!()
+    fn serialize_key<T>(&mut self, key: &T) -> Result<()> where
+        T: ? Sized + Serialize {
+        let key_value: Value = key.serialize(self.ser)?;
+        match key_value {
+            Value::String { string_value } => {
+                self.key = Option::Some(string_value);
+                Ok(())
+            }
+            _ => Err(Error::UnsupportedKeyType()),
+        }
     }
 
-    fn serialize_value<T: ? Sized>(&mut self, value: &T) -> Result<()> where
-        T: Serialize {
-        unimplemented!()
+    fn serialize_value<T>(&mut self, value: &T) -> Result<()> where
+        T: ? Sized + Serialize {
+        let serialized_value = value.serialize(self.ser)?;
+
+        match self.key {
+            // According to the Serde docs the following error should never be returned anyways as
+            // serde guarantees that serialize_key is run first.
+            None => Err(Error::SerialisationError("map key is missing".to_string())),
+            Some(ref k) => {
+                self.map.insert(k.clone(), serialized_value);
+                Ok(())
+            }
+        }
     }
 
     fn end(self) -> Result<Self::Ok> {
-        unimplemented!()
+        let properties = self.map.clone();
+        let entity_value = Entity {
+            properties
+        };
+
+        Ok(Value::EntityValue { entity_value })
     }
 }
 

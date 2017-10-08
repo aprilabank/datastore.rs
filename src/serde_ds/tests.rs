@@ -1,6 +1,7 @@
+use std::collections::HashMap;
 use serde::Serialize;
 use serde_ds::ser;
-use datastore::{Int, Blob, Value};
+use datastore::{Int, Blob, Value, Entity};
 
 // Tests for simple value serialisation
 #[test]
@@ -106,3 +107,25 @@ fn test_serialize_bytes() {
     assert_eq!(expected, result_bytes);
 }
 */
+
+#[test]
+fn test_serialize_map() {
+    let mut map = HashMap::new();
+    map.insert("key".to_string(), "value");
+
+    let result = ser::to_value(&map).expect("HashMap serialization failed");
+
+    let mut expected_properties = HashMap::new();
+    expected_properties.insert(
+        "key".to_string(),
+        Value::String { string_value: "value".to_string() },
+    );
+
+    let expected = Value::EntityValue {
+        entity_value: Entity {
+            properties: expected_properties,
+        },
+    };
+
+    assert_eq!(expected, result);
+}
