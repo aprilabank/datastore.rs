@@ -1,4 +1,4 @@
-use serde::{Serialize};
+use serde::Serialize;
 use serde_ds::ser;
 use datastore::{Int, Blob, Value};
 
@@ -12,26 +12,26 @@ fn test_serialize_ints() {
     let res_u8 = ser::to_value(&(14 as u8)).expect("u8 serialization failed");
     assert_eq!(expected, res_u8);
 
-    let res_u16= ser::to_value(&(14 as u16)).expect("u16 serialization failed");
+    let res_u16 = ser::to_value(&(14 as u16)).expect("u16 serialization failed");
     assert_eq!(expected, res_u16);
 
-    let res_u32= ser::to_value(&(14 as u32)).expect("u32 serialization failed");
+    let res_u32 = ser::to_value(&(14 as u32)).expect("u32 serialization failed");
     assert_eq!(expected, res_u32);
 
-    let res_u64= ser::to_value(&(14 as u64)).expect("u64 serialization failed");
+    let res_u64 = ser::to_value(&(14 as u64)).expect("u64 serialization failed");
     assert_eq!(expected, res_u64);
 
     // Test signed types
     let res_i8 = ser::to_value(&(14 as i8)).expect("i8 serialization failed");
     assert_eq!(expected, res_i8);
 
-    let res_i16= ser::to_value(&(14 as i16)).expect("i16 serialization failed");
+    let res_i16 = ser::to_value(&(14 as i16)).expect("i16 serialization failed");
     assert_eq!(expected, res_i16);
 
-    let res_i32= ser::to_value(&(14 as i32)).expect("i32 serialization failed");
+    let res_i32 = ser::to_value(&(14 as i32)).expect("i32 serialization failed");
     assert_eq!(expected, res_i32);
 
-    let res_i64= ser::to_value(&(14 as i64)).expect("i64 serialization failed");
+    let res_i64 = ser::to_value(&(14 as i64)).expect("i64 serialization failed");
     assert_eq!(expected, res_i64);
 }
 
@@ -88,7 +88,7 @@ fn test_serialize_option() {
     assert_eq!(expected_some, result_some);
 
     let result_none = ser::to_value(&(Option::None as Option<u8>)).expect("Option::None serialization failed");
-    let expected_none = Value::Null {null_value: ()};
+    let expected_none = Value::Null { null_value: () };
     assert_eq!(expected_none, result_none);
 }
 

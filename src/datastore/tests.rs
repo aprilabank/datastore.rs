@@ -59,7 +59,7 @@ fn test_entity_deserialisation() {
 
     let expected_products = Value::Array {
         array_value: ArrayValue {
-            values: vec![ Value::String { string_value: "creditline".to_string() } ],
+            values: vec![Value::String { string_value: "creditline".to_string() }],
         },
     };
 

@@ -10,7 +10,7 @@ pub fn to_value<T: Serialize>(value: &T) -> Result<Value> {
     value.serialize(&serializer)
 }
 
-impl <'a> ser::Serializer for &'a Serializer {
+impl<'a> ser::Serializer for &'a Serializer {
     type Ok = Value;
     type Error = Error;
 
@@ -29,35 +29,35 @@ impl <'a> ser::Serializer for &'a Serializer {
     // All integer types are represented by the same type in Datastore.
 
     fn serialize_i8(self, v: i8) -> Result<Self::Ok> {
-        Ok(Value::Integer { integer_value: Int(v as i64)} )
+        Ok(Value::Integer { integer_value: Int(v as i64) })
     }
 
     fn serialize_i16(self, v: i16) -> Result<Self::Ok> {
-        Ok(Value::Integer { integer_value: Int(v as i64)} )
+        Ok(Value::Integer { integer_value: Int(v as i64) })
     }
 
     fn serialize_i32(self, v: i32) -> Result<Self::Ok> {
-        Ok(Value::Integer { integer_value: Int(v as i64)} )
+        Ok(Value::Integer { integer_value: Int(v as i64) })
     }
 
     fn serialize_i64(self, v: i64) -> Result<Self::Ok> {
-        Ok(Value::Integer { integer_value: Int(v as i64)} )
+        Ok(Value::Integer { integer_value: Int(v as i64) })
     }
 
     fn serialize_u8(self, v: u8) -> Result<Self::Ok> {
-        Ok(Value::Integer { integer_value: Int(v as i64)} )
+        Ok(Value::Integer { integer_value: Int(v as i64) })
     }
 
     fn serialize_u16(self, v: u16) -> Result<Self::Ok> {
-        Ok(Value::Integer { integer_value: Int(v as i64)} )
+        Ok(Value::Integer { integer_value: Int(v as i64) })
     }
 
     fn serialize_u32(self, v: u32) -> Result<Self::Ok> {
-        Ok(Value::Integer { integer_value: Int(v as i64)} )
+        Ok(Value::Integer { integer_value: Int(v as i64) })
     }
 
     fn serialize_u64(self, v: u64) -> Result<Self::Ok> {
-        Ok(Value::Integer { integer_value: Int(v as i64)} )
+        Ok(Value::Integer { integer_value: Int(v as i64) })
     }
 
     // Likewise, all floating-point numbers map to the same type.
@@ -70,18 +70,12 @@ impl <'a> ser::Serializer for &'a Serializer {
         Ok(Value::Double { double_value: v })
     }
 
-    fn serialize_char(self, v: char) -> Result<Self::Ok> {
-        // Serialising a single character makes no sense in Datastore. Is that a string? An int?
-        // Noone knows.
-        Err(Error::UnsupportedValueType("char"))
-    }
-
     fn serialize_str(self, v: &str) -> Result<Self::Ok> {
         Ok(Value::String { string_value: v.to_string() })
     }
 
     fn serialize_bytes(self, v: &[u8]) -> Result<Self::Ok> {
-        Ok(Value::Blob { blob_value: Blob(v.to_vec())} )
+        Ok(Value::Blob { blob_value: Blob(v.to_vec()) })
     }
 
     fn serialize_none(self) -> Result<Self::Ok> {
@@ -109,7 +103,7 @@ impl <'a> ser::Serializer for &'a Serializer {
     }
 
     fn serialize_newtype_struct<T>(self, name: &'static str, value: &T) -> Result<Self::Ok> where
-        T: ?Sized + Serialize {
+        T: ? Sized + Serialize {
         value.serialize(self)
     }
 
@@ -137,6 +131,12 @@ impl <'a> ser::Serializer for &'a Serializer {
         Ok(self) // TODO: Presumably?
     }
 
+    fn serialize_char(self, v: char) -> Result<Self::Ok> {
+        // Serialising a single character makes no sense in Datastore. Is that a string? An int?
+        // Noone knows.
+        Err(Error::UnsupportedValueType("char"))
+    }
+
     fn serialize_tuple_variant(self, name: &'static str, variant_index: u32, variant: &'static str, len: usize) -> Result<Self::SerializeTupleVariant> {
         // It is unclear how to correctly tag tuple variants in Datastore at the moment.
         // Using internal tagging is strange: Does that mean that, if we serialise tuples as an
@@ -155,7 +155,7 @@ impl <'a> ser::Serializer for &'a Serializer {
     }
 }
 
-impl <'a> ser::SerializeMap for &'a Serializer {
+impl<'a> ser::SerializeMap for &'a Serializer {
     type Ok = Value;
     type Error = Error;
 
