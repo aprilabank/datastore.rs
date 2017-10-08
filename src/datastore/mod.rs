@@ -39,7 +39,7 @@ pub struct LatLng {
 
 /// This newtype around a byte vector provides base64-based (de-)serialisation for use in Datastore.
 #[derive(Debug, PartialEq)]
-pub struct Blob(Vec<u8>);
+pub struct Blob(pub Vec<u8>);
 
 impl Serialize for Blob {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -63,7 +63,7 @@ impl<'de> Deserialize<'de> for Blob {
 /// This newtype around a 64-bit signed integer provides string-based (de-)serialisation for
 /// use in Datastore.
 #[derive(Debug, PartialEq)]
-pub struct Int(i64);
+pub struct Int(pub i64);
 
 impl Serialize for Int {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where
