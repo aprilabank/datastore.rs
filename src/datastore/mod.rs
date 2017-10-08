@@ -7,38 +7,38 @@ use chrono::{DateTime, Utc};
 #[cfg(test)]
 mod tests;
 
-#[derive(Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 pub struct PartitionId {
     project_id: String,
     namespace_id: String,
 }
 
-#[derive(Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 #[serde(untagged)]
 pub enum PathElement {
     Id { kind: String, id: String },
     Name { kind: String, name: String },
 }
 
-#[derive(Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 pub struct Key {
     partition_id: PartitionId,
     path: Vec<PathElement>,
 }
 
-#[derive(Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 pub struct ArrayValue {
     values: Vec<Value>,
 }
 
-#[derive(Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 pub struct LatLng {
     latitude: f64,
     longitude: f64,
 }
 
 /// This newtype around a byte vector provides base64-based (de-)serialisation for use in Datastore.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Blob(pub Vec<u8>);
 
 impl Serialize for Blob {
@@ -62,7 +62,7 @@ impl<'de> Deserialize<'de> for Blob {
 
 /// This newtype around a 64-bit signed integer provides string-based (de-)serialisation for
 /// use in Datastore.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Int(pub i64);
 
 impl Serialize for Int {
@@ -84,7 +84,7 @@ impl<'de> Deserialize<'de> for Int {
 }
 
 // Currently the many nested attributes are needed because of https://github.com/serde-rs/serde/issues/1061
-#[derive(Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 #[serde(untagged)]
 pub enum Value {
     Null {
@@ -133,7 +133,7 @@ pub enum Value {
     },
 }
 
-#[derive(Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 pub struct Entity {
-    properties: HashMap<String, Value>,
+    pub properties: HashMap<String, Value>,
 }
