@@ -51,12 +51,11 @@ fn test_serialize_floats() {
 fn test_serialize_string() {
     let expected = Value::String { string_value: "serialized string".to_string() };
 
-    let result_str = ser::to_value(&"serialized string")
-        .expect("String serialisation failed");
+    let result_str = ser::to_value(&"serialized string").expect("String serialisation failed");
     assert_eq!(expected, result_str);
 
-    let result_string = ser::to_value(&"serialized string".to_string())
-        .expect("String serialisation failed");
+    let result_string =
+        ser::to_value(&"serialized string".to_string()).expect("String serialisation failed");
     assert_eq!(expected, result_string);
 }
 
@@ -84,11 +83,13 @@ fn test_serialize_unit() {
 
 #[test]
 fn test_serialize_option() {
-    let result_some = ser::to_value(&(Option::Some(4 as u8))).expect("Option::Some serialization failed");
+    let result_some =
+        ser::to_value(&(Option::Some(4 as u8))).expect("Option::Some serialization failed");
     let expected_some = Value::Integer { integer_value: Int(4) };
     assert_eq!(expected_some, result_some);
 
-    let result_none = ser::to_value(&(Option::None as Option<u8>)).expect("Option::None serialization failed");
+    let result_none =
+        ser::to_value(&(Option::None as Option<u8>)).expect("Option::None serialization failed");
     let expected_none = Value::Null { null_value: () };
     assert_eq!(expected_none, result_none);
 }
@@ -123,11 +124,7 @@ fn test_serialize_map() {
         Value::String { string_value: "value".to_string() },
     );
 
-    let expected = Value::EntityValue {
-        entity_value: Entity {
-            properties: expected_properties,
-        },
-    };
+    let expected = Value::EntityValue { entity_value: Entity { properties: expected_properties } };
 
     assert_eq!(expected, result);
 }
@@ -142,7 +139,7 @@ fn test_serialize_seq() {
             values: vec![
                 Value::String { string_value: "hello".to_string() },
                 Value::String { string_value: "rust".to_string() },
-            ]
+            ],
         },
     };
 
@@ -174,11 +171,7 @@ fn test_serialize_struct() {
         Value::Boolean { boolean_value: true },
     );
 
-    let expected = Value::EntityValue {
-        entity_value: Entity {
-            properties: expected_properties,
-        }
-    };
+    let expected = Value::EntityValue { entity_value: Entity { properties: expected_properties } };
 
     assert_eq!(expected, serialized);
 }

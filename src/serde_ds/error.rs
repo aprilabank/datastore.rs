@@ -7,7 +7,6 @@ pub type Result<T> = std::result::Result<T, Error>;
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Error {
-    SomeError(),
     SerialisationError(String),
     DeserialisationError(String),
     UnsupportedValueType(&'static str),

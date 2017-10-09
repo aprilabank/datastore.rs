@@ -5,7 +5,8 @@ mod ser;
 mod de;
 
 /*
-By convention a Serde data format crate provides the following in the root module or re-exported from the root module:
+By convention a Serde data format crate provides the following in the root module or re-exported
+from the root module:
 
 * [x] An Error type common to both serialization and deserialization.
 * [x] A Result typedef which is equivalent to std::result::Result<T, Error>.
