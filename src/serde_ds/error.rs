@@ -12,6 +12,10 @@ pub enum Error {
     UnsupportedValueType(&'static str),
     UnsupportedCompoundType(&'static str),
     UnsupportedKeyType(),
+    NonSelfDescribingType(),
+    ExpectedType(&'static str),
+    IntegerSizeMismatch(),
+    DoubleSizeMismatch(),
 }
 
 // https://serde.rs/error-handling.html
