@@ -59,6 +59,10 @@ impl<'a> ser::Serializer for &'a Serializer {
     }
 
     fn serialize_u64(self, v: u64) -> Result<Self::Ok> {
+        use std;
+        if v > (std::i64::MAX as u64){
+            return Err(Error::IntegerSizeMismatch())
+        }
         Ok(Value::Integer { integer_value: Int(v as i64) })
     }
 
