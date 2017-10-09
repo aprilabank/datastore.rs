@@ -252,6 +252,23 @@ impl<'a> ser::SerializeMap for MapSerializer<'a> {
         }
     }
 
+    fn serialize_entry<K, V>(&mut self, key: &K, value: &V) -> Result<()>
+    where
+        K: ?Sized + Serialize,
+        V: ?Sized + Serialize,
+    {
+        let key_str = match key.serialize(self.ser)? {
+            Value::String { string_value } => {
+                Ok(string_value)
+            }
+            _ => Err(Error::UnsupportedKeyType()),
+        }?;
+
+        let serialized_value = value.serialize(self.ser)?;
+        self.map.insert(key_str, serialized_value);
+        Ok(())
+    }
+
     fn end(self) -> Result<Self::Ok> {
         let entity_value = Entity { properties: self.map };
 
