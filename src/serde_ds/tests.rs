@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use serde::Serialize;
 use serde_ds::ser;
-use datastore::{Int, Blob, Value, Entity};
+use datastore::{Int, Blob, Value, Entity, ArrayValue};
 
 // Tests for simple value serialisation
 #[test]
@@ -128,6 +128,23 @@ fn test_serialize_map() {
     };
 
     assert_eq!(expected, result);
+}
+
+#[test]
+fn test_serialize_seq() {
+    let test_vec = vec!["hello", "rust"];
+    let serialized = ser::to_value(&test_vec).expect("vector serialization failed");
+
+    let expected = Value::Array {
+        array_value: ArrayValue {
+            values: vec![
+                Value::String { string_value: "hello".to_string() },
+                Value::String { string_value: "rust".to_string() },
+            ]
+        },
+    };
+
+    assert_eq!(expected, serialized);
 }
 
 #[test]

@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::fmt::Display;
 use serde::ser::{self, Serialize};
 use serde_ds::error::{Error, Result};
-use datastore::{Value, Entity, Int, Blob};
+use datastore::{Value, Entity, Int, Blob, ArrayValue};
 
 #[derive(Copy, Clone)]
 pub struct Serializer;
@@ -16,7 +16,7 @@ impl<'a> ser::Serializer for &'a Serializer {
     type Ok = Value;
     type Error = Error;
 
-    type SerializeSeq = Self;
+    type SerializeSeq = SeqSerializer<'a>;
     type SerializeTuple = Self;
     type SerializeTupleStruct = Self;
     type SerializeTupleVariant = Self;
@@ -110,15 +110,10 @@ impl<'a> ser::Serializer for &'a Serializer {
     }
 
     fn serialize_seq(self, len: Option<usize>) -> Result<Self::SerializeSeq> {
-        Ok(self)
-    }
-
-    fn serialize_tuple(self, len: usize) -> Result<Self::SerializeTuple> {
-        self.serialize_seq((Some(len)))
-    }
-
-    fn serialize_tuple_struct(self, name: &'static str, len: usize) -> Result<Self::SerializeTupleStruct> {
-        self.serialize_seq((Some(len)))
+        Ok(SeqSerializer {
+            ser: &self,
+            vec: vec![],
+        })
     }
 
     fn serialize_map(self, len: Option<usize>) -> Result<Self::SerializeMap> {
@@ -166,6 +161,16 @@ impl<'a> ser::Serializer for &'a Serializer {
         // The reasoning for not implementing this yet is exactly the same as us stated above for
         // tuple variant serialisation.
         Err(Error::UnsupportedValueType("serde newtype variant"))
+    }
+
+    // Tuples should *probably* serialise to sequences, too. Not decided yet.
+
+    fn serialize_tuple(self, len: usize) -> Result<Self::SerializeTuple> {
+        Err(Error::UnsupportedValueType("serde tuple"))
+    }
+
+    fn serialize_tuple_struct(self, name: &'static str, len: usize) -> Result<Self::SerializeTupleStruct> {
+        Err(Error::UnsupportedValueType("serde tuple struct"))
     }
 }
 
@@ -237,21 +242,29 @@ impl<'a> ser::SerializeStruct for MapSerializer<'a> {
     }
 }
 
-impl<'a> ser::SerializeTuple for &'a Serializer {
+pub struct SeqSerializer<'a> {
+    ser: &'a Serializer,
+    vec: Vec<Value>,
+}
+
+impl<'a> ser::SerializeSeq for SeqSerializer<'a> {
     type Ok = Value;
     type Error = Error;
 
-    fn serialize_element<T: ? Sized>(&mut self, value: &T) -> Result<()> where
-        T: Serialize {
-        unimplemented!()
+    fn serialize_element<T>(&mut self, value: &T) -> Result<()>
+        where T: ? Sized + Serialize {
+        let serialized_value = value.serialize(self.ser)?;
+        self.vec.push(serialized_value);
+        Ok(())
     }
 
     fn end(self) -> Result<Self::Ok> {
-        unimplemented!()
+        let array_value = Value::Array { array_value: ArrayValue { values: self.vec} };
+        Ok(array_value)
     }
 }
 
-impl<'a> ser::SerializeSeq for &'a Serializer {
+impl<'a> ser::SerializeTuple for &'a Serializer {
     type Ok = Value;
     type Error = Error;
 

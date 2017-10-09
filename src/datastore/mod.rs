@@ -28,7 +28,7 @@ pub struct Key {
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 pub struct ArrayValue {
-    values: Vec<Value>,
+    pub values: Vec<Value>,
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
