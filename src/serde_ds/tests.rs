@@ -98,6 +98,8 @@ fn test_serialize_option() {
 Byte serialization test does not pass - gets handed to serialize_vec despite an implementation for
 &[u8] - why?
 
+Note: https://github.com/serde-rs/bytes
+
 #[test]
 fn test_serialize_bytes() {
     let result_bytes = ser::to_value(&"foo".as_bytes().to_vec())
