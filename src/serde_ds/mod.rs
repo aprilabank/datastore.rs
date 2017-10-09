@@ -1,7 +1,5 @@
 // Implementation of Serde Serialiser & Deserialiser for Datastore entities
 
-use datastore::*;
-
 mod error;
 mod ser;
 mod de;
@@ -24,4 +22,7 @@ By convention a Serde data format crate provides the following in the root modul
 pub use self::error::{Error, Result};
 
 #[cfg(test)]
-mod tests;
+mod ser_tests;
+
+#[cfg(test)]
+mod de_tests;

@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use serde::Serialize;
 use serde_ds::ser;
-use datastore::{Int, Blob, Value, Entity, ArrayValue};
+use datastore::{Int, Value, Entity, ArrayValue};
 
 // Tests for simple value serialisation
 #[test]
