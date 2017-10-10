@@ -75,3 +75,28 @@ fn test_map_deserialization() {
 
     assert_eq!(expected, result)
 }
+
+#[test]
+fn test_struct_deserialization() {
+    #[derive(Debug, Deserialize, PartialEq)]
+    struct Language {
+        name: String,
+        strongly_typed: bool,
+    };
+
+    // Prepare test data (excuse the ceremony, I should have a few extra `From` instances for this).
+    let mut properties = HashMap::new();
+    properties.insert("name".to_string(), Value::String { string_value: "Rust".to_string() });
+    properties.insert("strongly_typed".to_string(), Value::Boolean { boolean_value: true } );
+    let entity = Entity { properties };
+    let input = Value::EntityValue { entity_value: entity };
+
+    let expected = Language {
+        name: String::from("Rust"),
+        strongly_typed: true,
+    };
+
+    let result: Language = de::from_value(input).expect("struct deserialization failed");
+
+    assert_eq!(expected, result);
+}

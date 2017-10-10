@@ -215,14 +215,14 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer {
 
     fn deserialize_struct<V>(
         self,
-        name: &'static str,
-        fields: &'static [&'static str],
+        _name: &'static str,
+        _fields: &'static [&'static str],
         visitor: V,
     ) -> Result<V::Value>
         where
             V: Visitor<'de>,
     {
-        unimplemented!()
+        visitor.visit_map(EntityAccess::new(&self.input)?)
     }
 
     fn deserialize_enum<V>(
