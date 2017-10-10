@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use serde::Serialize;
-use serde_ds::ser;
+use serde_ds::{ser, Error};
 use serde_bytes;
 use datastore::{Blob, Int, Value, Entity, ArrayValue};
 
@@ -35,6 +35,17 @@ fn test_serialize_ints() {
 
     let res_i64 = ser::to_value(&(14 as i64)).expect("i64 serialization failed");
     assert_eq!(expected, res_i64);
+}
+
+#[test]
+fn test_u64_size_error() {
+    use std;
+
+    let input = std::u64::MAX;
+    let expected = Error::IntegerSizeMismatch();
+    let res_u64 = ser::to_value(&input);
+
+    assert_eq!(res_u64.unwrap_err(), expected);
 }
 
 #[test]
