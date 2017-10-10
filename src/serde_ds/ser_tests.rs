@@ -1,7 +1,8 @@
 use std::collections::HashMap;
 use serde::Serialize;
 use serde_ds::ser;
-use datastore::{Int, Value, Entity, ArrayValue};
+use serde_bytes;
+use datastore::{Blob, Int, Value, Entity, ArrayValue};
 
 // Tests for simple value serialisation
 #[test]
@@ -94,22 +95,15 @@ fn test_serialize_option() {
     assert_eq!(expected_none, result_none);
 }
 
-/*
-
-Byte serialization test does not pass - gets handed to serialize_vec despite an implementation for
-&[u8] - why?
-
-Note: https://github.com/serde-rs/bytes
-
 #[test]
 fn test_serialize_bytes() {
-    let result_bytes = ser::to_value(&"foo".as_bytes().to_vec())
+    let input = serde_bytes::Bytes::new(b"foo");
+    let result_bytes = ser::to_value(&input)
         .expect("bytes serialization failed");
     let expected = Value::Blob { blob_value: Blob(vec!['f' as u8, 'o' as u8, 'o' as u8]) };
 
     assert_eq!(expected, result_bytes);
 }
-*/
 
 #[test]
 fn test_serialize_map() {
