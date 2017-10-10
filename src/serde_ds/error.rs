@@ -1,6 +1,5 @@
 use std;
 use std::fmt::{self, Display};
-use std::str::FromStr;
 use std::num;
 
 use serde::{ser, de};
@@ -18,6 +17,7 @@ pub enum Error {
     NonSelfDescribingType(),
     ExpectedType(&'static str),
     DoubleSizeMismatch(),
+    NotYetImplemented(&'static str),
 }
 
 impl From<num::ParseIntError> for Error {
@@ -39,7 +39,7 @@ impl de::Error for Error {
 }
 
 impl Display for Error {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, _f: &mut fmt::Formatter) -> fmt::Result {
         unimplemented!()
     }
 }

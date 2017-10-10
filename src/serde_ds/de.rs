@@ -1,9 +1,8 @@
-use datastore::{Int, Value, Entity};
+use datastore::{Int, Value};
 use serde::Deserialize;
-use serde::de::{self, Visitor, MapAccess, SeqAccess, DeserializeSeed};
+use serde::de::{self, Visitor, MapAccess, DeserializeSeed};
 use serde_ds::{Result, Error};
 use std;
-use std::str::FromStr;
 use std::collections::hash_map::IntoIter;
 
 pub struct Deserializer {

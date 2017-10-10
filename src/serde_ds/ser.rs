@@ -1,8 +1,7 @@
 use std::collections::HashMap;
-use std::fmt::Display;
 use serde::ser::{self, Serialize};
 use serde_ds::error::{Error, Result};
-use datastore::{Value, Entity, Int, Blob, ArrayValue};
+use datastore::{Value, Entity, Blob};
 
 #[derive(Copy, Clone)]
 pub struct Serializer;
@@ -96,7 +95,7 @@ impl<'a> ser::Serializer for &'a Serializer {
     }
 
     // Serialize struct with no data as null value - there is no data after all!
-    fn serialize_unit_struct(self, name: &'static str) -> Result<Self::Ok> {
+    fn serialize_unit_struct(self, _name: &'static str) -> Result<Self::Ok> {
         self.serialize_unit()
     }
 
@@ -111,7 +110,7 @@ impl<'a> ser::Serializer for &'a Serializer {
         self.serialize_str(variant)
     }
 
-    fn serialize_newtype_struct<T>(self, name: &'static str, value: &T) -> Result<Self::Ok>
+    fn serialize_newtype_struct<T>(self, _name: &'static str, value: &T) -> Result<Self::Ok>
         where
             T: ? Sized + Serialize,
     {
@@ -135,7 +134,7 @@ impl<'a> ser::Serializer for &'a Serializer {
         Ok(map_serializer)
     }
 
-    fn serialize_struct(self, name: &'static str, len: usize) -> Result<Self::SerializeStruct> {
+    fn serialize_struct(self, _name: &'static str, _len: usize) -> Result<Self::SerializeStruct> {
         let map_serializer = MapSerializer {
             ser: &self,
             map: HashMap::new(),
@@ -147,15 +146,15 @@ impl<'a> ser::Serializer for &'a Serializer {
 
     fn serialize_struct_variant(
         self,
-        name: &'static str,
-        variant_index: u32,
-        variant: &'static str,
-        len: usize,
+        _name: &'static str,
+        _variant_index: u32,
+        _variant: &'static str,
+        _len: usize,
     ) -> Result<Self::SerializeStructVariant> {
-        Ok(self) // TODO: Presumably?
+        Err(Error::NotYetImplemented("struct variant serialization"))
     }
 
-    fn serialize_char(self, v: char) -> Result<Self::Ok> {
+    fn serialize_char(self, _: char) -> Result<Self::Ok> {
         // Serialising a single character makes no sense in Datastore. Is that a string? An int?
         // Noone knows.
         Err(Error::UnsupportedValueType("char"))
@@ -163,10 +162,10 @@ impl<'a> ser::Serializer for &'a Serializer {
 
     fn serialize_tuple_variant(
         self,
-        name: &'static str,
-        variant_index: u32,
-        variant: &'static str,
-        len: usize,
+        _name: &'static str,
+        _variant_index: u32,
+        _variant: &'static str,
+        _len: usize,
     ) -> Result<Self::SerializeTupleVariant> {
         // It is unclear how to correctly tag tuple variants in Datastore at the moment.
         // Using internal tagging is strange: Does that mean that, if we serialise tuples as an
@@ -174,34 +173,34 @@ impl<'a> ser::Serializer for &'a Serializer {
         //
         // We also don't want to insert an extra entity in Datastore that contains a single array
         // value (the actual tuple) keyed with the tag, because that is cumbersome to work with.
-        Err(Error::UnsupportedValueType("serde tuple variant"))
+        Err(Error::NotYetImplemented("serde tuple variant"))
     }
 
     fn serialize_newtype_variant<T: ? Sized>(
         self,
-        name: &'static str,
-        variant_index: u32,
-        variant: &'static str,
-        value: &T,
+        _name: &'static str,
+        _variant_index: u32,
+        _variant: &'static str,
+        _value: &T,
     ) -> Result<Self::Ok>
         where
             T: Serialize,
     {
         // The reasoning for not implementing this yet is exactly the same as us stated above for
         // tuple variant serialisation.
-        Err(Error::UnsupportedValueType("serde newtype variant"))
+        Err(Error::NotYetImplemented("serde newtype variant"))
     }
 
     // Tuples should *probably* serialise to sequences, too. Not decided yet.
 
-    fn serialize_tuple(self, len: usize) -> Result<Self::SerializeTuple> {
-        Err(Error::UnsupportedValueType("serde tuple"))
+    fn serialize_tuple(self, _len: usize) -> Result<Self::SerializeTuple> {
+        Err(Error::NotYetImplemented("tuple"))
     }
 
     fn serialize_tuple_struct(
         self,
-        name: &'static str,
-        len: usize,
+        _name: &'static str,
+        _len: usize,
     ) -> Result<Self::SerializeTupleStruct> {
         Err(Error::UnsupportedValueType("serde tuple struct"))
     }
@@ -321,7 +320,7 @@ impl<'a> ser::SerializeTuple for &'a Serializer {
     type Ok = Value;
     type Error = Error;
 
-    fn serialize_element<T: ? Sized>(&mut self, value: &T) -> Result<()>
+    fn serialize_element<T: ? Sized>(&mut self, _value: &T) -> Result<()>
         where
             T: Serialize,
     {
@@ -337,9 +336,9 @@ impl<'a> ser::SerializeStructVariant for &'a Serializer {
     type Ok = Value;
     type Error = Error;
 
-    fn serialize_field<T: ? Sized>(&mut self, key: &'static str, value: &T) -> Result<()>
+    fn serialize_field<T>(&mut self, _key: &'static str, _value: &T) -> Result<()>
         where
-            T: Serialize,
+            T: ? Sized + Serialize,
     {
         unimplemented!()
     }
@@ -353,7 +352,7 @@ impl<'a> ser::SerializeTupleStruct for &'a Serializer {
     type Ok = Value;
     type Error = Error;
 
-    fn serialize_field<T: ? Sized>(&mut self, value: &T) -> Result<()>
+    fn serialize_field<T: ? Sized>(&mut self, _value: &T) -> Result<()>
         where
             T: Serialize,
     {
@@ -369,7 +368,7 @@ impl<'a> ser::SerializeTupleVariant for &'a Serializer {
     type Ok = Value;
     type Error = Error;
 
-    fn serialize_field<T: ? Sized>(&mut self, value: &T) -> Result<()>
+    fn serialize_field<T: ? Sized>(&mut self, _value: &T) -> Result<()>
         where
             T: Serialize,
     {

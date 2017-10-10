@@ -1,8 +1,7 @@
 use std::collections::HashMap;
-use serde::Serialize;
-use serde_ds::{ser, Error};
+use serde_ds::ser;
 use serde_bytes;
-use datastore::{Blob, Value, Entity, ArrayValue};
+use datastore::{Blob, Value, Entity};
 
 // Tests for simple value serialisation
 #[test]
@@ -152,7 +151,7 @@ fn test_serialize_struct() {
 
     let serialized = ser::to_value(&rust).expect("struct serialization failed");
 
-    let properties = hashmap!{
+    let properties = hashmap! {
         "name".to_string() => Value::from("Rust"),
         "strongly_typed".to_string() => Value::from(true),
     };
