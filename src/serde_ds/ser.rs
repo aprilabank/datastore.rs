@@ -31,39 +31,35 @@ impl<'a> ser::Serializer for &'a Serializer {
     // All integer types are represented by the same type in Datastore.
 
     fn serialize_i8(self, v: i8) -> Result<Self::Ok> {
-        Ok(Value::Integer { integer_value: Int(v as i64) })
+        Ok(Value::Integer { integer_value: Int::from(v) })
     }
 
     fn serialize_i16(self, v: i16) -> Result<Self::Ok> {
-        Ok(Value::Integer { integer_value: Int(v as i64) })
+        Ok(Value::Integer { integer_value: Int::from(v) })
     }
 
     fn serialize_i32(self, v: i32) -> Result<Self::Ok> {
-        Ok(Value::Integer { integer_value: Int(v as i64) })
+        Ok(Value::Integer { integer_value: Int::from(v) })
     }
 
     fn serialize_i64(self, v: i64) -> Result<Self::Ok> {
-        Ok(Value::Integer { integer_value: Int(v as i64) })
+        Ok(Value::Integer { integer_value: Int::from(v) })
     }
 
     fn serialize_u8(self, v: u8) -> Result<Self::Ok> {
-        Ok(Value::Integer { integer_value: Int(v as i64) })
+        Ok(Value::Integer { integer_value: Int::from(v) })
     }
 
     fn serialize_u16(self, v: u16) -> Result<Self::Ok> {
-        Ok(Value::Integer { integer_value: Int(v as i64) })
+        Ok(Value::Integer { integer_value: Int::from(v) })
     }
 
     fn serialize_u32(self, v: u32) -> Result<Self::Ok> {
-        Ok(Value::Integer { integer_value: Int(v as i64) })
+        Ok(Value::Integer { integer_value: Int::from(v) })
     }
 
     fn serialize_u64(self, v: u64) -> Result<Self::Ok> {
-        use std;
-        if v > (std::i64::MAX as u64){
-            return Err(Error::IntegerSizeMismatch())
-        }
-        Ok(Value::Integer { integer_value: Int(v as i64) })
+        Ok(Value::Integer { integer_value: Int::from(v) })
     }
 
     // Likewise, all floating-point numbers map to the same type.

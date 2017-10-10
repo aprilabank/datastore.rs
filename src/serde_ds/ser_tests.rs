@@ -8,7 +8,7 @@ use datastore::{Blob, Int, Value, Entity, ArrayValue};
 #[test]
 fn test_serialize_ints() {
     // Same expected result for all integers
-    let expected = Value::Integer { integer_value: Int(14) };
+    let expected = Value::Integer { integer_value: Int::from(14) };
 
     // Test unsigned types
     let res_u8 = ser::to_value(&(14 as u8)).expect("u8 serialization failed");
@@ -35,17 +35,6 @@ fn test_serialize_ints() {
 
     let res_i64 = ser::to_value(&(14 as i64)).expect("i64 serialization failed");
     assert_eq!(expected, res_i64);
-}
-
-#[test]
-fn test_u64_size_error() {
-    use std;
-
-    let input = std::u64::MAX;
-    let expected = Error::IntegerSizeMismatch();
-    let res_u64 = ser::to_value(&input);
-
-    assert_eq!(res_u64.unwrap_err(), expected);
 }
 
 #[test]
@@ -97,7 +86,7 @@ fn test_serialize_unit() {
 fn test_serialize_option() {
     let result_some =
         ser::to_value(&(Option::Some(4 as u8))).expect("Option::Some serialization failed");
-    let expected_some = Value::Integer { integer_value: Int(4) };
+    let expected_some = Value::Integer { integer_value: Int::from(4) };
     assert_eq!(expected_some, result_some);
 
     let result_none =

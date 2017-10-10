@@ -3,6 +3,7 @@ use serde::de::Error;
 use serde::{Serialize, Deserialize, Serializer, Deserializer};
 use base64;
 use chrono::{DateTime, Utc};
+use std::str::FromStr;
 
 #[cfg(test)]
 mod tests;
@@ -43,8 +44,8 @@ pub struct Blob(pub Vec<u8>);
 
 impl Serialize for Blob {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
+        where
+            S: Serializer,
     {
         let bytes: &[u8] = self.0.as_ref();
         let encoded = base64::encode(bytes);
@@ -54,8 +55,8 @@ impl Serialize for Blob {
 
 impl<'de> Deserialize<'de> for Blob {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
+        where
+            D: Deserializer<'de>,
     {
         let str = String::deserialize(deserializer)?;
         base64::decode(&str).map(|vec| Blob(vec)).map_err(|e| {
@@ -64,32 +65,33 @@ impl<'de> Deserialize<'de> for Blob {
     }
 }
 
-/// This newtype around a 64-bit signed integer provides string-based (de-)serialisation for
-/// use in Datastore.
-#[derive(Debug, PartialEq, Clone)]
-pub struct Int(pub i64);
+/// Datastore represents all integral types as string.
+#[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]
+pub struct Int(String);
 
-impl Serialize for Int {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        let string_rep = format!("{}", self.0);
-        serializer.serialize_str(string_rep.as_str())
+impl Int {
+    // Delegate to the String::parse method.
+    pub fn parse<T: FromStr>(&self) -> Result<T, <T as FromStr>::Err> {
+        self.0.parse()
     }
 }
 
-impl<'de> Deserialize<'de> for Int {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        let int_str: String = String::deserialize(deserializer)?;
-        int_str.parse().map(|i| Int(i)).map_err(|e| {
-            D::Error::custom(format!("could not parse int: {:?}", e))
-        })
-    }
-}
+// Boilerplate for int -> Int conversions:
+impl From<u8> for Int { fn from(v: u8) -> Self { Int(format!("{}", v)) } }
+
+impl From<u16> for Int { fn from(v: u16) -> Self { Int(format!("{}", v)) } }
+
+impl From<u32> for Int { fn from(v: u32) -> Self { Int(format!("{}", v)) } }
+
+impl From<u64> for Int { fn from(v: u64) -> Self { Int(format!("{}", v)) } }
+
+impl From<i8> for Int { fn from(v: i8) -> Self { Int(format!("{}", v)) } }
+
+impl From<i16> for Int { fn from(v: i16) -> Self { Int(format!("{}", v)) } }
+
+impl From<i32> for Int { fn from(v: i32) -> Self { Int(format!("{}", v)) } }
+
+impl From<i64> for Int { fn from(v: i64) -> Self { Int(format!("{}", v)) } }
 
 // Currently the many nested attributes are needed because of
 // https://github.com/serde-rs/serde/issues/1061

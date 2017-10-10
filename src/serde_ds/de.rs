@@ -1,18 +1,13 @@
-use datastore::Value;
+use datastore::{Int, Value};
 use serde::Deserialize;
 use serde::de::{self, Visitor};
 use serde_ds::{Result, Error};
 use std;
+use std::str::FromStr;
 
 pub struct Deserializer<'de> {
     input: &'de Value,
 }
-
-/*impl<'de> Deserializer<'de> {
-    pub fn from_value(input: &'de Value) -> Self {
-        Deserializer { input }
-    }
-}*/
 
 pub fn from_value<'de, T>(input: &'de Value) -> Result<T>
 where
@@ -22,12 +17,10 @@ where
     T::deserialize(&mut deserializer)
 }
 
-// Conditionally unwraps the i64 contained in a Datastore Integer value (if the value is of the
-// correct type).
-fn int_value<'de>(input: &'de Value) -> Result<i64> {
+fn int_value<'de>(input: &'de Value) -> Result<&'de Int> {
     match *input {
-        Value::Integer { ref integer_value } => Ok(integer_value.0),
-        _ => Err(Error::ExpectedType("integer")),
+        Value::Integer { ref integer_value } => Ok(integer_value),
+        _ => Err(Error::ExpectedType("integer"))
     }
 }
 
@@ -62,91 +55,45 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
         }
     }
 
-    fn deserialize_i8<V>(self, visitor: V) -> Result<V::Value>
-    where
-        V: Visitor<'de>,
-    {
-        let i = int_value(self.input)?;
-        if i > (std::i8::MAX as i64) {
-            Err(Error::IntegerSizeMismatch())
-        } else {
-            visitor.visit_i8(i as i8)
-        }
+    fn deserialize_i8<V: Visitor<'de>>(self, visitor: V) -> Result<V::Value> {
+        let i = int_value(self.input)?.parse()?;
+        visitor.visit_i8(i)
     }
 
-    fn deserialize_i16<V>(self, visitor: V) -> Result<V::Value>
-    where
-        V: Visitor<'de>,
-    {
-        let i = int_value(self.input)?;
-        if i > (std::i16::MAX as i64) {
-            Err(Error::IntegerSizeMismatch())
-        } else {
-            visitor.visit_i16(i as i16)
-        }
+    fn deserialize_i16<V: Visitor<'de>>(self, visitor: V) -> Result<V::Value> {
+        let i = int_value(self.input)?.parse()?;
+        visitor.visit_i16(i)
     }
 
-    fn deserialize_i32<V>(self, visitor: V) -> Result<V::Value>
-    where
-        V: Visitor<'de>,
-    {
-        let i = int_value(self.input)?;
-        if i > (std::i32::MAX as i64) {
-            Err(Error::IntegerSizeMismatch())
-        } else {
-            visitor.visit_i32(i as i32)
-        }
+    fn deserialize_i32<V: Visitor<'de>>(self, visitor: V) -> Result<V::Value> {
+        let i = int_value(self.input)?.parse()?;
+        visitor.visit_i32(i)
     }
 
-    fn deserialize_i64<V>(self, visitor: V) -> Result<V::Value>
-    where
-        V: Visitor<'de>,
-    {
-        visitor.visit_i64(int_value(self.input)?)
+    fn deserialize_i64<V: Visitor<'de>>(self, visitor: V) -> Result<V::Value> {
+        let i = int_value(self.input)?.parse()?;
+        visitor.visit_i64(i)
     }
 
-    fn deserialize_u8<V>(self, visitor: V) -> Result<V::Value>
-    where
-        V: Visitor<'de>,
-    {
-        let i = int_value(self.input)?;
-        if i > (std::u8::MAX as i64) {
-            Err(Error::IntegerSizeMismatch())
-        } else {
-            visitor.visit_u8(i as u8)
-        }
+    fn deserialize_u8<V: Visitor<'de>>(self, visitor: V) -> Result<V::Value> {
+        let i = int_value(self.input)?.parse()?;
+        visitor.visit_u8(i)
     }
 
-    fn deserialize_u16<V>(self, visitor: V) -> Result<V::Value>
-    where
-        V: Visitor<'de>,
-    {
-        let i = int_value(self.input)?;
-        if i > (std::u16::MAX as i64) {
-            Err(Error::IntegerSizeMismatch())
-        } else {
-            visitor.visit_u16(i as u16)
-        }
+    fn deserialize_u16<V: Visitor<'de>>(self, visitor: V) -> Result<V::Value> {
+        let i = int_value(self.input)?.parse()?;
+        visitor.visit_u16(i)
     }
 
-    fn deserialize_u32<V>(self, visitor: V) -> Result<V::Value>
-    where
-        V: Visitor<'de>,
-    {
-        let i = int_value(self.input)?;
-        if i > (std::u32::MAX as i64) {
-            Err(Error::IntegerSizeMismatch())
-        } else {
-            visitor.visit_u32(i as u32)
-        }
+
+    fn deserialize_u32<V: Visitor<'de>>(self, visitor: V) -> Result<V::Value> {
+        let i = int_value(self.input)?.parse()?;
+        visitor.visit_u32(i)
     }
 
-    fn deserialize_u64<V>(self, visitor: V) -> Result<V::Value>
-    where
-        V: Visitor<'de>,
-    {
-        let i = int_value(self.input)?;
-        visitor.visit_u64(i as u64)
+    fn deserialize_u64<V: Visitor<'de>>(self, visitor: V) -> Result<V::Value> {
+        let i = int_value(self.input)?.parse()?;
+        visitor.visit_u64(i)
     }
 
     fn deserialize_f32<V>(self, visitor: V) -> Result<V::Value>

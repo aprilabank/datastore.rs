@@ -50,7 +50,7 @@ fn test_blob_serialisation() {
 
 #[test]
 fn test_int_serialisation() {
-    let int = Int(1337); // Sometimes a cliche is required.
+    let int = Int::from(1337); // Sometimes a cliche is required.
     let expected = "\"1337\"".to_string();
 
     let serialised = serde_json::to_string(&int).expect("Serialisation failed");
@@ -65,7 +65,7 @@ fn test_int_serialisation() {
     assert_eq!(
         int,
         deserialised,
-        "Deserialised int shoudl match initial value"
+        "Deserialised int should match initial value"
     );
 }
 
