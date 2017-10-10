@@ -50,7 +50,8 @@ fn test_integer_overflows() {
     let res_i32 = de::from_value::<i32>(&input).unwrap_err();
     assert_eq!(expected, res_i32);
 
-    de::from_value::<i64>(&input).expect("i64::MAX deserialization failed");
+    let res_i64 = de::from_value::<i64>(&input);
+    assert!(res_i64.is_ok(), "i64::MAX deserialization failed");
 
     // Unsigned integer types
 
@@ -63,7 +64,9 @@ fn test_integer_overflows() {
     let res_u32 = de::from_value::<u32>(&input).unwrap_err();
     assert_eq!(expected, res_u32);
 
-    de::from_value::<u64>(&input).expect("u64 deserialization of i64::MAX failed");
+    let res_u64 = de::from_value::<u64>(&input);
+    assert!(res_u64.is_ok(), "u64 deserialization of i64::MAX failed");
+
 }
 
 #[test]
