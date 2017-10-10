@@ -4,7 +4,6 @@ use serde::de::{self, Visitor, MapAccess, SeqAccess, DeserializeSeed};
 use serde_ds::{Result, Error};
 use std;
 use std::str::FromStr;
-use std::collections::HashMap;
 use std::collections::hash_map::IntoIter;
 
 pub struct Deserializer {
@@ -307,7 +306,7 @@ impl<'de> MapAccess<'de> for EntityAccess {
 
                 // Key needs to wrapped in a value unfortunately. This will change in a future
                 // refactoring.
-                let kv = Value::String { string_value: k };
+                let kv = Value::from(k);
                 let mut key_deserializer = Deserializer { input: kv };
                 seed.deserialize(&mut key_deserializer).map(Some)
             }
