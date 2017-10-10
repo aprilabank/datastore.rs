@@ -9,12 +9,9 @@ extern crate serde_json;
 extern crate base64;
 extern crate chrono;
 
-pub mod datastore;
-
 #[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
-}
+extern crate serde_bytes;
+
+// TODO: Rename -> api
+pub mod datastore;
+pub mod serde_ds;
