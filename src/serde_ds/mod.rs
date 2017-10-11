@@ -10,8 +10,8 @@ from the root module:
 
 * [x] An Error type common to both serialization and deserialization.
 * [x] A Result typedef which is equivalent to std::result::Result<T, Error>.
-* [ ] A Serializer type which implements serde::Serializer.
-* [ ] A Deserializer type which implements serde::Deserializer.
+* [x] A Serializer type which implements serde::Serializer.
+* [x] A Deserializer type which implements serde::Deserializer.
 * [ ] One or more to_abc functions depending on what types the format supports serializing to.
       For example to_string which returns a String, to_bytes which returns a Vec<u8>, or to_writer
       which writes into an io::Write.
