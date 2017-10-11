@@ -100,3 +100,12 @@ fn test_struct_deserialization() {
 
     assert_eq!(expected, result);
 }
+
+#[test]
+fn test_sequence_deserialization() {
+    let input = Value::from(vec![Value::from("Hello"), Value::from("World!")]);
+    let expected = vec!["Hello".to_string(), "World!".to_string()];
+    let result: Vec<String> = de::from_value(input).expect("sequence deserialization failed");
+
+    assert_eq!(expected, result)
+}

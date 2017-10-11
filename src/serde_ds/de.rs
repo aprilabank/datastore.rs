@@ -1,9 +1,10 @@
 use datastore::{Int, Value};
 use serde::Deserialize;
-use serde::de::{self, Visitor, MapAccess, DeserializeSeed};
+use serde::de::{self, Visitor, MapAccess, DeserializeSeed, SeqAccess};
 use serde_ds::{Result, Error};
 use std;
-use std::collections::hash_map::IntoIter;
+use std::vec;
+use std::collections::hash_map;
 
 pub struct Deserializer {
     input: Value,
@@ -200,11 +201,11 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer {
         self.deserialize_str(visitor)
     }
 
-    fn deserialize_seq<V>(self, _visitor: V) -> Result<V::Value>
+    fn deserialize_seq<V>(self, visitor: V) -> Result<V::Value>
         where
             V: Visitor<'de>,
     {
-        Err(Error::NotYetImplemented("sequence deserialization"))
+        visitor.visit_seq(ArrayAccess::new(&self.input)?)
     }
 
     fn deserialize_map<V: Visitor<'de>>(self, visitor: V) -> Result<V::Value> {
@@ -270,8 +271,40 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer {
     }
 }
 
+struct ArrayAccess {
+    iter: vec::IntoIter<Value>,
+}
+
+impl ArrayAccess {
+    fn new(v: &Value) -> Result<Self> {
+        let array = match *v {
+            Value::Array { ref array_value } => Ok(array_value.clone().values),
+            _ => Err(Error::ExpectedType("array")),
+        }?;
+
+        let iter = array.into_iter();
+
+        Ok(ArrayAccess{ iter })
+    }
+}
+
+impl<'de> SeqAccess<'de> for ArrayAccess {
+    type Error = Error;
+
+    fn next_element_seed<T>(&mut self, seed: T) -> Result<Option<T::Value>> where
+        T: DeserializeSeed<'de> {
+        let mut deserializer = match self.iter.next() {
+            None => return Ok(None),
+            Some(v) => Deserializer { input: v }
+        };
+
+        seed.deserialize(&mut deserializer).map(Some)
+    }
+}
+
+
 struct EntityAccess {
-    iter: IntoIter<String, Value>,
+    iter: hash_map::IntoIter<String, Value>,
     next_value: Option<Value>,
 }
 
