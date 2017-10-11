@@ -84,9 +84,9 @@ impl<'a> ser::Serializer for &'a Serializer {
         self.serialize_unit()
     }
 
-    fn serialize_some<T: ?Sized>(self, value: &T) -> Result<Self::Ok>
-    where
-        T: Serialize,
+    fn serialize_some<T: ? Sized>(self, value: &T) -> Result<Self::Ok>
+        where
+            T: Serialize,
     {
         value.serialize(self)
     }
@@ -112,8 +112,8 @@ impl<'a> ser::Serializer for &'a Serializer {
     }
 
     fn serialize_newtype_struct<T>(self, name: &'static str, value: &T) -> Result<Self::Ok>
-    where
-        T: ?Sized + Serialize,
+        where
+            T: ? Sized + Serialize,
     {
         value.serialize(self)
     }
@@ -177,15 +177,15 @@ impl<'a> ser::Serializer for &'a Serializer {
         Err(Error::UnsupportedValueType("serde tuple variant"))
     }
 
-    fn serialize_newtype_variant<T: ?Sized>(
+    fn serialize_newtype_variant<T: ? Sized>(
         self,
         name: &'static str,
         variant_index: u32,
         variant: &'static str,
         value: &T,
     ) -> Result<Self::Ok>
-    where
-        T: Serialize,
+        where
+            T: Serialize,
     {
         // The reasoning for not implementing this yet is exactly the same as us stated above for
         // tuple variant serialisation.
@@ -218,8 +218,8 @@ impl<'a> ser::SerializeMap for MapSerializer<'a> {
     type Error = Error;
 
     fn serialize_key<T>(&mut self, key: &T) -> Result<()>
-    where
-        T: ?Sized + Serialize,
+        where
+            T: ? Sized + Serialize,
     {
         let key_value: Value = key.serialize(self.ser)?;
         match key_value {
@@ -232,8 +232,8 @@ impl<'a> ser::SerializeMap for MapSerializer<'a> {
     }
 
     fn serialize_value<T>(&mut self, value: &T) -> Result<()>
-    where
-        T: ?Sized + Serialize,
+        where
+            T: ? Sized + Serialize,
     {
         let serialized_value = value.serialize(self.ser)?;
 
@@ -249,9 +249,9 @@ impl<'a> ser::SerializeMap for MapSerializer<'a> {
     }
 
     fn serialize_entry<K, V>(&mut self, key: &K, value: &V) -> Result<()>
-    where
-        K: ?Sized + Serialize,
-        V: ?Sized + Serialize,
+        where
+            K: ? Sized + Serialize,
+            V: ? Sized + Serialize,
     {
         let key_str = match key.serialize(self.ser)? {
             Value::String { string_value } => {
@@ -279,8 +279,8 @@ impl<'a> ser::SerializeStruct for MapSerializer<'a> {
     type Error = Error;
 
     fn serialize_field<T>(&mut self, key: &'static str, value: &T) -> Result<()>
-    where
-        T: ?Sized + Serialize,
+        where
+            T: ? Sized + Serialize,
     {
         let serialized_value = value.serialize(self.ser)?;
         self.map.insert(key.to_string(), serialized_value);
@@ -304,8 +304,8 @@ impl<'a> ser::SerializeSeq for SeqSerializer<'a> {
     type Error = Error;
 
     fn serialize_element<T>(&mut self, value: &T) -> Result<()>
-    where
-        T: ?Sized + Serialize,
+        where
+            T: ? Sized + Serialize,
     {
         let serialized_value = value.serialize(self.ser)?;
         self.vec.push(serialized_value);
@@ -322,9 +322,9 @@ impl<'a> ser::SerializeTuple for &'a Serializer {
     type Ok = Value;
     type Error = Error;
 
-    fn serialize_element<T: ?Sized>(&mut self, value: &T) -> Result<()>
-    where
-        T: Serialize,
+    fn serialize_element<T: ? Sized>(&mut self, value: &T) -> Result<()>
+        where
+            T: Serialize,
     {
         unimplemented!()
     }
@@ -338,9 +338,9 @@ impl<'a> ser::SerializeStructVariant for &'a Serializer {
     type Ok = Value;
     type Error = Error;
 
-    fn serialize_field<T: ?Sized>(&mut self, key: &'static str, value: &T) -> Result<()>
-    where
-        T: Serialize,
+    fn serialize_field<T: ? Sized>(&mut self, key: &'static str, value: &T) -> Result<()>
+        where
+            T: Serialize,
     {
         unimplemented!()
     }
@@ -354,9 +354,9 @@ impl<'a> ser::SerializeTupleStruct for &'a Serializer {
     type Ok = Value;
     type Error = Error;
 
-    fn serialize_field<T: ?Sized>(&mut self, value: &T) -> Result<()>
-    where
-        T: Serialize,
+    fn serialize_field<T: ? Sized>(&mut self, value: &T) -> Result<()>
+        where
+            T: Serialize,
     {
         unimplemented!()
     }
@@ -370,9 +370,9 @@ impl<'a> ser::SerializeTupleVariant for &'a Serializer {
     type Ok = Value;
     type Error = Error;
 
-    fn serialize_field<T: ?Sized>(&mut self, value: &T) -> Result<()>
-    where
-        T: Serialize,
+    fn serialize_field<T: ? Sized>(&mut self, value: &T) -> Result<()>
+        where
+            T: Serialize,
     {
         unimplemented!()
     }
