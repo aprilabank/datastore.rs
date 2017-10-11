@@ -36,7 +36,7 @@ Required for now are:
 * [x] [Entity](https://cloud.google.com/datastore/docs/reference/rest/v1/Entity)
 * [ ] [EntityResult](https://cloud.google.com/datastore/docs/reference/rest/v1/EntityResult)
 * [x] [Key](https://cloud.google.com/datastore/docs/reference/rest/v1/Key)
-* [ ] [Value](https://cloud.google.com/datastore/docs/reference/rest/v1/projects/runQuery#Value)
+* [x] [Value](https://cloud.google.com/datastore/docs/reference/rest/v1/projects/runQuery#Value)
 * [x] [PartitionId](https://cloud.google.com/datastore/docs/reference/rest/v1/PartitionId)
 * [ ] [ReadOptions](https://cloud.google.com/datastore/docs/reference/rest/v1/ReadOptions)
 * [ ] [CommonMetadata](https://cloud.google.com/datastore/docs/reference/rest/Shared.Types/CommonMetadata)

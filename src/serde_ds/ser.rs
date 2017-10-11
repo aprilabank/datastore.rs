@@ -239,7 +239,7 @@ impl<'a> ser::SerializeMap for MapSerializer<'a> {
         match self.key {
             // According to the Serde docs the following error should never be returned anyways as
             // serde guarantees that serialize_key is run first.
-            None => Err(Error::SerialisationError("map key is missing".to_string())),
+            None => Err(Error::SerializationError("map key is missing".to_string())),
             Some(ref k) => {
                 self.map.insert(k.clone(), serialized_value);
                 Ok(())
