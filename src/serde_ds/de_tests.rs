@@ -5,7 +5,7 @@ use serde_ds::Error;
 
 #[test]
 fn test_deserialize_ints() {
-    let input = Value::Integer { integer_value: Int(42) };
+    let input = Value::Integer { integer_value: Int::from(42) };
 
     // Signed integer types
 
@@ -34,39 +34,6 @@ fn test_deserialize_ints() {
 
     let res_u64: u64 = de::from_value(&input).expect("u64 deserialization failed");
     assert_eq!(42, res_u64);
-}
-
-#[test]
-fn test_integer_overflows() {
-    let input = Value::Integer { integer_value: Int(std::i64::MAX) };
-    let expected = Error::IntegerSizeMismatch();
-
-    let res_i8 = de::from_value::<i8>(&input).unwrap_err();
-    assert_eq!(expected, res_i8);
-
-    let res_i16 = de::from_value::<i16>(&input).unwrap_err();
-    assert_eq!(expected, res_i16);
-
-    let res_i32 = de::from_value::<i32>(&input).unwrap_err();
-    assert_eq!(expected, res_i32);
-
-    let res_i64 = de::from_value::<i64>(&input);
-    assert!(res_i64.is_ok(), "i64::MAX deserialization failed");
-
-    // Unsigned integer types
-
-    let res_u8 = de::from_value::<u8>(&input).unwrap_err();
-    assert_eq!(expected, res_u8);
-
-    let res_u16 = de::from_value::<u16>(&input).unwrap_err();
-    assert_eq!(expected, res_u16);
-
-    let res_u32 = de::from_value::<u32>(&input).unwrap_err();
-    assert_eq!(expected, res_u32);
-
-    let res_u64 = de::from_value::<u64>(&input);
-    assert!(res_u64.is_ok(), "u64 deserialization of i64::MAX failed");
-
 }
 
 #[test]
