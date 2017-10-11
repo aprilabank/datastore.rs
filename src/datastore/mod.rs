@@ -219,3 +219,9 @@ impl From<Blob> for Value {
         Value::Blob { blob_value }
     }
 }
+
+impl From<DateTime<Utc>> for Value {
+    fn from(timestamp_value: DateTime<Utc>) -> Self {
+        Value::Timestamp { timestamp_value }
+    }
+}

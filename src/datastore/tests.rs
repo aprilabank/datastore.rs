@@ -80,24 +80,17 @@ fn test_entity_deserialisation() {
 
     let expected_cl_options =
         hashmap!(
-        "scoringStatus".to_string() => Value::String { string_value: "Accepted".to_string() },
+        "scoringStatus".to_string() => Value::from("Accepted"),
     );
 
-    let expected_products = Value::Array {
-        array_value: ArrayValue {
-            values: vec![Value::String { string_value: "creditline".to_string() }],
-        },
-    };
+    let expected_products = Value::from(vec!["creditline"]);
 
-    let properties =
-        hashmap!(
-        "email".to_string() => Value::String { string_value: "mags@mag".to_string() },
-        "companyCountry".to_string() => Value::String { string_value: "NO".to_string() },
-        "status".to_string() => Value::EntityValue {
-            entity_value: Entity { properties: expected_cl_options },
-        },
-        "signingId".to_string() => Value::Null { null_value: () },
-        "created".to_string() => Value::Timestamp { timestamp_value: expected_time },
+    let properties = hashmap!(
+        "email".to_string() => Value::from("mags@mag"),
+        "companyCountry".to_string() => Value::from("NO"),
+        "status".to_string() => Value::from( Entity { properties: expected_cl_options } ),
+        "signingId".to_string() => Value::from(()),
+        "created".to_string() => Value::from(expected_time),
         "availableProducts".to_string() => expected_products,
     );
 
