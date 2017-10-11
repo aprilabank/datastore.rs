@@ -27,3 +27,6 @@ mod ser_tests;
 
 #[cfg(test)]
 mod de_tests;
+
+#[cfg(test)]
+mod roundtrip_tests;
