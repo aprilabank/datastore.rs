@@ -84,7 +84,6 @@ fn test_struct_deserialization() {
         strongly_typed: bool,
     };
 
-    // Prepare test data (excuse the ceremony, I should have a few extra `From` instances for this).
     let properties = hashmap!(
         "name".to_string() => Value::from("Rust"),
         "strongly_typed".to_string() => Value::from(true),
