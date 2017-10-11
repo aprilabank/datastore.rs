@@ -203,10 +203,14 @@ impl<T> From<T> for Value where T: Into<Int> {
     }
 }
 
-impl From<Vec<Value>> for Value {
-    fn from(values: Vec<Value>) -> Self {
-        let array_value = ArrayValue { values };
-        Value::Array { array_value }
+impl<T> From<Vec<T>> for Value where T: Into<Value> {
+    fn from(values: Vec<T>) -> Self {
+        let mut out: Vec<Value> = vec![];
+        for value in values {
+            out.push(value.into())
+        }
+
+        return Value::Array { array_value: ArrayValue { values: out } }
     }
 }
 
