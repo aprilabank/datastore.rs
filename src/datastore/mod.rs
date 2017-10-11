@@ -4,6 +4,7 @@ use serde::{Serialize, Deserialize, Serializer, Deserializer};
 use base64;
 use chrono::{DateTime, Utc};
 use std::str::FromStr;
+use std::convert::Into;
 
 #[cfg(test)]
 mod tests;
@@ -41,6 +42,15 @@ pub struct LatLng {
 /// This newtype around a byte vector provides base64-based (de-)serialisation for use in Datastore.
 #[derive(Debug, PartialEq, Clone)]
 pub struct Blob(pub Vec<u8>);
+
+impl From<Vec<u8>> for Blob { fn from(v: Vec<u8>) -> Blob { Blob(v) } }
+
+impl<'a> From<&'a [u8]> for Blob {
+    fn from(v: &'a [u8]) -> Self {
+        Blob(v.to_vec())
+    }
+}
+
 
 impl Serialize for Blob {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -147,4 +157,61 @@ pub enum Value {
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 pub struct Entity {
     pub properties: HashMap<String, Value>,
+}
+
+// Lifestyle improvements via `From` instances for `Value`:
+
+impl<'a> From<&'a str> for Value {
+    fn from(s: &'a str) -> Self {
+        Value::String { string_value: s.to_string() }
+    }
+}
+
+impl From<String> for Value {
+    fn from(string_value: String) -> Self {
+        Value::String { string_value }
+    }
+}
+
+impl From<bool> for Value {
+    fn from(boolean_value: bool) -> Self {
+        Value::Boolean { boolean_value }
+    }
+}
+
+impl From<Entity> for Value {
+    fn from(entity_value: Entity) -> Self {
+        Value::EntityValue { entity_value }
+    }
+}
+
+impl From<()> for Value {
+    fn from(_: ()) -> Self {
+        Value::Null { null_value: () }
+    }
+}
+
+impl From<f64> for Value {
+    fn from(double_value: f64) -> Self {
+        Value::Double { double_value }
+    }
+}
+
+impl<T> From<T> for Value where T: Into<Int> {
+    fn from(i: T) -> Self {
+        Value::Integer { integer_value: i.into() }
+    }
+}
+
+impl From<Vec<Value>> for Value {
+    fn from(values: Vec<Value>) -> Self {
+        let array_value = ArrayValue { values };
+        Value::Array { array_value }
+    }
+}
+
+impl From<Blob> for Value {
+    fn from(blob_value: Blob) -> Self {
+        Value::Blob { blob_value }
+    }
 }

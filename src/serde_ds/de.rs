@@ -1,10 +1,8 @@
-use datastore::{Int, Value, Entity};
+use datastore::{Int, Value};
 use serde::Deserialize;
-use serde::de::{self, Visitor, MapAccess, SeqAccess, DeserializeSeed};
+use serde::de::{self, Visitor, MapAccess, DeserializeSeed};
 use serde_ds::{Result, Error};
 use std;
-use std::str::FromStr;
-use std::collections::HashMap;
 use std::collections::hash_map::IntoIter;
 
 pub struct Deserializer {
@@ -181,14 +179,14 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer {
         }
     }
 
-    fn deserialize_unit_struct<V>(self, name: &'static str, visitor: V) -> Result<V::Value>
+    fn deserialize_unit_struct<V>(self, _name: &'static str, visitor: V) -> Result<V::Value>
         where
             V: Visitor<'de>,
     {
         self.deserialize_unit(visitor)
     }
 
-    fn deserialize_newtype_struct<V>(self, name: &'static str, visitor: V) -> Result<V::Value>
+    fn deserialize_newtype_struct<V>(self, _name: &'static str, visitor: V) -> Result<V::Value>
         where
             V: Visitor<'de>,
     {
@@ -202,11 +200,11 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer {
         self.deserialize_str(visitor)
     }
 
-    fn deserialize_seq<V>(self, visitor: V) -> Result<V::Value>
+    fn deserialize_seq<V>(self, _visitor: V) -> Result<V::Value>
         where
             V: Visitor<'de>,
     {
-        unimplemented!()
+        Err(Error::NotYetImplemented("sequence deserialization"))
     }
 
     fn deserialize_map<V: Visitor<'de>>(self, visitor: V) -> Result<V::Value> {
@@ -227,47 +225,48 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer {
 
     fn deserialize_enum<V>(
         self,
-        name: &'static str,
-        variants: &'static [&'static str],
-        visitor: V,
+        _name: &'static str,
+        _variants: &'static [&'static str],
+        _visitor: V,
     ) -> Result<V::Value>
         where
             V: Visitor<'de>,
     {
-        unimplemented!()
+        Err(Error::NotYetImplemented("enum deserialization"))
     }
 
-    fn deserialize_ignored_any<V>(self, visitor: V) -> Result<V::Value>
+    fn deserialize_ignored_any<V>(self, _visitor: V) -> Result<V::Value>
         where
             V: Visitor<'de>,
     {
-        unimplemented!() // FOO? Can this be unit?
+        // TODO: What is this even for?
+        Err(Error::NotYetImplemented("ignored value deserialization"))
     }
 
-    fn deserialize_char<V>(self, visitor: V) -> Result<V::Value>
+    fn deserialize_char<V>(self, _visitor: V) -> Result<V::Value>
         where
             V: Visitor<'de>,
     {
         Err(Error::UnsupportedValueType("char"))
     }
 
-    fn deserialize_tuple<V>(self, len: usize, visitor: V) -> Result<V::Value>
+    fn deserialize_tuple<V>(self, _len: usize, _visitor: V) -> Result<V::Value>
         where
             V: Visitor<'de>,
     {
-        Err(Error::UnsupportedValueType("tuple"))
+        Err(Error::NotYetImplemented("tuple deserialization"))
     }
 
     fn deserialize_tuple_struct<V>(
         self,
-        name: &'static str,
-        len: usize,
-        visitor: V,
+        _name: &'static str,
+        _len: usize,
+        _visitor: V,
     ) -> Result<V::Value>
         where
             V: Visitor<'de>,
     {
-        Err(Error::UnsupportedValueType("tuple struct"))
+        Err(Error::UnsupportedValueType("tuple struct deserialization"))
     }
 }
 
@@ -307,7 +306,7 @@ impl<'de> MapAccess<'de> for EntityAccess {
 
                 // Key needs to wrapped in a value unfortunately. This will change in a future
                 // refactoring.
-                let kv = Value::String { string_value: k };
+                let kv = Value::from(k);
                 let mut key_deserializer = Deserializer { input: kv };
                 seed.deserialize(&mut key_deserializer).map(Some)
             }

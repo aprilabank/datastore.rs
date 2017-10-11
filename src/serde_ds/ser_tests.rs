@@ -1,14 +1,13 @@
 use std::collections::HashMap;
-use serde::Serialize;
-use serde_ds::{ser, Error};
+use serde_ds::ser;
 use serde_bytes;
-use datastore::{Blob, Int, Value, Entity, ArrayValue};
+use datastore::{Blob, Value, Entity};
 
 // Tests for simple value serialisation
 #[test]
 fn test_serialize_ints() {
     // Same expected result for all integers
-    let expected = Value::Integer { integer_value: Int::from(14) };
+    let expected = Value::from(14);
 
     // Test unsigned types
     let res_u8 = ser::to_value(&(14 as u8)).expect("u8 serialization failed");
@@ -39,7 +38,7 @@ fn test_serialize_ints() {
 
 #[test]
 fn test_serialize_floats() {
-    let expected = Value::Double { double_value: 10.0 };
+    let expected = Value::from(10.0);
 
     let res_f32 = ser::to_value(&(10.0 as f32)).expect("f32 serialization failed");
     assert_eq!(expected, res_f32);
@@ -50,7 +49,7 @@ fn test_serialize_floats() {
 
 #[test]
 fn test_serialize_string() {
-    let expected = Value::String { string_value: "serialized string".to_string() };
+    let expected = Value::from("serialized string");
 
     let result_str = ser::to_value(&"serialized string").expect("String serialisation failed");
     assert_eq!(expected, result_str);
@@ -63,14 +62,14 @@ fn test_serialize_string() {
 
 #[test]
 fn test_serialize_bool() {
-    let expected = Value::Boolean { boolean_value: true };
+    let expected = Value::from(true);
     let result = ser::to_value(&true).expect("bool serialization failed");
     assert_eq!(expected, result);
 }
 
 #[test]
 fn test_serialize_unit() {
-    let expected = Value::Null { null_value: () };
+    let expected = Value::from(());
 
     let result_unit = ser::to_value(&()).expect("unit serialization failed");
     assert_eq!(expected, result_unit);
@@ -86,12 +85,12 @@ fn test_serialize_unit() {
 fn test_serialize_option() {
     let result_some =
         ser::to_value(&(Option::Some(4 as u8))).expect("Option::Some serialization failed");
-    let expected_some = Value::Integer { integer_value: Int::from(4) };
+    let expected_some = Value::from(4);
     assert_eq!(expected_some, result_some);
 
     let result_none =
         ser::to_value(&(Option::None as Option<u8>)).expect("Option::None serialization failed");
-    let expected_none = Value::Null { null_value: () };
+    let expected_none = Value::from(());
     assert_eq!(expected_none, result_none);
 }
 
@@ -100,7 +99,7 @@ fn test_serialize_bytes() {
     let input = serde_bytes::Bytes::new(b"foo");
     let result_bytes = ser::to_value(&input)
         .expect("bytes serialization failed");
-    let expected = Value::Blob { blob_value: Blob(vec!['f' as u8, 'o' as u8, 'o' as u8]) };
+    let expected = Value::from(Blob(vec!['f' as u8, 'o' as u8, 'o' as u8]));
 
     assert_eq!(expected, result_bytes);
 }
@@ -115,10 +114,10 @@ fn test_serialize_map() {
     let mut expected_properties = HashMap::new();
     expected_properties.insert(
         "key".to_string(),
-        Value::String { string_value: "value".to_string() },
+        Value::from("value"),
     );
 
-    let expected = Value::EntityValue { entity_value: Entity { properties: expected_properties } };
+    let expected = Value::from(Entity { properties: expected_properties });
 
     assert_eq!(expected, result);
 }
@@ -128,14 +127,11 @@ fn test_serialize_seq() {
     let test_vec = vec!["hello", "rust"];
     let serialized = ser::to_value(&test_vec).expect("vector serialization failed");
 
-    let expected = Value::Array {
-        array_value: ArrayValue {
-            values: vec![
-                Value::String { string_value: "hello".to_string() },
-                Value::String { string_value: "rust".to_string() },
-            ],
-        },
-    };
+    let expected = Value::from(vec![
+        Value::from("hello"),
+        Value::from("rust"),
+    ]);
+
 
     assert_eq!(expected, serialized);
 }
@@ -155,17 +151,12 @@ fn test_serialize_struct() {
 
     let serialized = ser::to_value(&rust).expect("struct serialization failed");
 
-    let mut expected_properties = HashMap::new();
-    expected_properties.insert(
-        "name".to_string(),
-        Value::String { string_value: "Rust".to_string() },
-    );
-    expected_properties.insert(
-        "strongly_typed".to_string(),
-        Value::Boolean { boolean_value: true },
-    );
+    let properties = hashmap! {
+        "name".to_string() => Value::from("Rust"),
+        "strongly_typed".to_string() => Value::from(true),
+    };
 
-    let expected = Value::EntityValue { entity_value: Entity { properties: expected_properties } };
+    let expected = Value::from(Entity { properties });
 
     assert_eq!(expected, serialized);
 }
