@@ -11,8 +11,8 @@ pub struct Deserializer {
 }
 
 pub fn from_value<'de, T: Deserialize<'de>>(input: Value) -> Result<T> {
-    let mut deserializer = Deserializer { input };
-    T::deserialize(&mut deserializer)
+    let deserializer = Deserializer { input };
+    T::deserialize(&deserializer)
 }
 
 fn int_value<'de>(input: &'de Value) -> Result<&'de Int> {
@@ -22,7 +22,7 @@ fn int_value<'de>(input: &'de Value) -> Result<&'de Int> {
     }
 }
 
-impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer {
+impl<'de, 'a> de::Deserializer<'de> for &'a Deserializer {
     type Error = Error;
 
     fn deserialize_any<V>(self, visitor: V) -> Result<V::Value>
@@ -293,12 +293,12 @@ impl<'de> SeqAccess<'de> for ArrayAccess {
 
     fn next_element_seed<T>(&mut self, seed: T) -> Result<Option<T::Value>> where
         T: DeserializeSeed<'de> {
-        let mut deserializer = match self.iter.next() {
+        let deserializer = match self.iter.next() {
             None => return Ok(None),
             Some(v) => Deserializer { input: v }
         };
 
-        seed.deserialize(&mut deserializer).map(Some)
+        seed.deserialize(&deserializer).map(Some)
     }
 }
 
@@ -340,8 +340,8 @@ impl<'de> MapAccess<'de> for EntityAccess {
                 // Key needs to wrapped in a value unfortunately. This will change in a future
                 // refactoring.
                 let kv = Value::from(k);
-                let mut key_deserializer = Deserializer { input: kv };
-                seed.deserialize(&mut key_deserializer).map(Some)
+                let key_deserializer = Deserializer { input: kv };
+                seed.deserialize(&key_deserializer).map(Some)
             }
         }
     }
@@ -353,8 +353,7 @@ impl<'de> MapAccess<'de> for EntityAccess {
         let input = self.next_value.clone().expect("next_value_seed called before next_key_seed");
         self.next_value = None;
 
-        let mut val_deserializer = Deserializer { input };
-
-        seed.deserialize(&mut val_deserializer)
+        let val_deserializer = Deserializer { input };
+        seed.deserialize(&val_deserializer)
     }
 }
